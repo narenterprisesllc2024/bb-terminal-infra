@@ -8,7 +8,8 @@ WORKDIR /work/src/app
 RUN npm install --no-audit --no-fund
 
 # Stage 2: runtime — Python OpenBB API + Vite preview server
-FROM python:3.12-slim-bookworm AS runtime
+# OpenBB Platform 4.x supports Python 3.9–3.11 (not yet 3.12).
+FROM python:3.11-slim-bookworm AS runtime
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     NODE_VERSION=20
@@ -25,8 +26,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN git clone --depth 1 https://github.com/vaughanf1/BB-Terminal.git /app/src
 WORKDIR /app/src
 
-# install OpenBB platform + its providers (this is the heavy step ~3 min)
-RUN pip install --upgrade pip && pip install openbb openbb-api uvicorn fastapi
+# install OpenBB platform (this is the heavy step ~3 min)
+# openbb-api command is shipped with openbb-core; uvicorn/fastapi pulled in transitively.
+RUN pip install --upgrade pip && pip install "openbb[all]" uvicorn fastapi
 
 # bring over node_modules from builder
 COPY --from=ui-builder /work/src/app/node_modules /app/src/app/node_modules
