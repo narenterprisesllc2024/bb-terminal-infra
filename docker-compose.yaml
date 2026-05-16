@@ -6,13 +6,13 @@ services:
     container_name: bb-terminal
     restart: unless-stopped
     ports:
-      - "5173"
-      - "6900"
+      - "127.0.0.1:25810:5173"
+      - "127.0.0.1:25811:6900"
     environment:
       - PYTHONUNBUFFERED=1
     healthcheck:
-      test: ["CMD", "curl", "-fsSL", "http://localhost:5173/", "||", "exit", "1"]
+      test: ["CMD-SHELL", "curl -fsSL http://localhost:5173/ || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 60s
+      start_period: 300s
